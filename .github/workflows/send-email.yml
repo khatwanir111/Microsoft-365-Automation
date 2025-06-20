@@ -1,12 +1,12 @@
-name: Daily Graph Email
+name: Email and Commit Every 5 Minutes
 
 on:
   schedule:
-    - cron: '0/5 * * * *'  # Runs daily at 08:30 UTC
+    - cron: '*/5 * * * *'  # every 5 minutes
   workflow_dispatch:
 
 jobs:
-  send-email:
+  email-and-commit:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +18,7 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install requests
+    - name: Install dependencies
       run: pip install requests
 
     - name: Run email script
@@ -28,3 +28,46 @@ jobs:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         EMAIL: ${{ secrets.EMAIL }}
       run: python send_email.py
+
+    - name: Generate random commit message and commit
+      run: |
+        SENTENCES=(
+          "Email sent successfully ✅"
+          "Automated email dispatched 📧"
+          "Graph API email sent at $(date)"
+          "Dev activity ongoing 🚀"
+          "Sending emails like a pro! 📬"
+          "Keeping the inbox busy 📨"
+          "Automated email sent with love ❤️"
+          "Email bot in action 🤖"
+          "Ping! Another email sent 📤"
+          "GitHub Actions hard at work 💻"
+          "Code running smoothly ⚙️"
+          "Another task completed ✅"
+          "Continuous integration in progress 🔄"
+          "Just pushing some code magic ✨"
+          "Automating all the things 🤖"
+          "Commitment to excellence 💪"
+          "Task automated and committed 📋"
+          "Logging progress step by step 📝"
+          "Your friendly neighborhood bot 🤝"
+          "Emails flying out like rockets 🚀"
+          "Keeping the pipeline flowing 🌊"
+          "Script executed, mission accomplished 🎯"
+          "Automated updates coming through 🔔"
+          "Pushing progress one commit at a time 🛠️"
+          "Bots do it better 🤖🔥"
+        )
+        RANDOM_INDEX=$(( RANDOM % ${#SENTENCES[@]} ))
+        MSG="${SENTENCES[$RANDOM_INDEX]}"
+        echo "$MSG" > commit-message.txt
+
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Append log with timestamp
+        echo "$(date) - $MSG" >> EMAIL_LOG.md
+
+        git add EMAIL_LOG.md commit-message.txt
+        git commit -m "$MSG"
+        git push origin HEAD:${{ github.ref_name }}
