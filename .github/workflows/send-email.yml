@@ -1,0 +1,30 @@
+name: Daily Graph Email
+
+on:
+  schedule:
+    - cron: '30 8 * * *'  # Runs daily at 08:30 UTC
+  workflow_dispatch:
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install requests
+      run: pip install requests
+
+    - name: Run email script
+      env:
+        TENANT_ID: ${{ secrets.TENANT_ID }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        EMAIL: ${{ secrets.EMAIL }}
+      run: python send_email.py
