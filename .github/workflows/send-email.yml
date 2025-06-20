@@ -2,7 +2,7 @@ name: Daily Graph Email
 
 on:
   schedule:
-    - cron: '30 8 * * *'  # Runs daily at 08:30 UTC
+    - cron: '0,30 * * * *'  # Runs daily at 08:30 UTC
   workflow_dispatch:
 
 jobs:
